@@ -5,7 +5,7 @@ import Encryption from '../../libs/Encryption'
 export default function JupiterClient(opts: IJupiterClientOpts) {
   const encryption = Encryption({ secret: opts.encryptSecret })
   const CONF = {
-    feeNQT: opts.feeNQT || 500,
+    feeNQT: opts.feeNQT || 100,
     deadline: opts.deadline || 60,
     minimumTableBalance: opts.minimumTableBalance || 50000,
     minimumAppBalance: opts.minimumAppBalance || 100000,
@@ -17,12 +17,17 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
     new BigNumber(nqt).div(CONF.moneyDecimals).toString()
 
   return {
+    recordKey: '__jupiter-password-manager',
+
     client: axios.create({
       baseURL: opts.server,
       headers: {
         'User-Agent': 'jupiter-password-manager',
       },
     }),
+
+    decrypt: encryption.decrypt.bind(encryption),
+    encrypt: encryption.encrypt.bind(encryption),
 
     async loadDatabase() {
       const transactions = await this.getAllTransactions()
@@ -57,29 +62,62 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
       return { address, publicKey, requestProcessingTime, account }
     },
 
-    async parseEncryptedRecord(cipherText: string): Promise<IStringMap> {
-      return JSON.parse(await encryption.decrypt(cipherText))
+    async sendMoney(recipientAddr: string, sendingAddr: string = opts.address) {
+      const { data } = await this.request('post', '/nxt', {
+        params: {
+          requestType: 'sendMoney',
+          secretPhrase: opts.passphrase,
+          recipient: recipientAddr,
+          amountNQT: CONF.minimumTableBalance,
+          feeNQT: CONF.feeNQT,
+          deadline: CONF.deadline,
+        },
+      })
+      if (data.signatureHash === null) throw new Error(data)
+      return data
     },
 
-    async storeRecord(record: IStringMap) {
+    async parseEncryptedRecord(cipherText: string): Promise<IFndrAccount> {
+      return JSON.parse(await this.decrypt(cipherText))
+    },
+
+    async storeRecord(record: IFndrAccount) {
       const { data } = await this.request('post', '/nxt', {
         params: {
           requestType: 'sendMessage',
           secretPhrase: opts.passphrase,
           recipient: opts.address,
-          messageToEncrypt: encryption.encrypt(
+          recipientPublicKey: opts.publicKey,
+          messageToEncrypt: await this.encrypt(
             JSON.stringify({
               ...record,
-              [`__jupiter-password-manager`]: true,
+              [this.recordKey]: true,
             })
           ),
           feeNQT: CONF.feeNQT,
           deadline: CONF.deadline,
-          recipientPublicKey: opts.publicKey,
           compressMessageToEncrypt: true,
         },
       })
+      if (data.errorCode && data.errorCode !== 0) throw new Error(data)
       return data
+    },
+
+    async decryptRecord(
+      message: ITransactionAttachmentDecryptedMessage
+    ): Promise<string> {
+      const {
+        data: { decryptedMessage },
+      } = await this.request('get', '/nxt', {
+        params: {
+          requestType: 'decryptFrom',
+          secretPhrase: opts.passphrase,
+          account: opts.address,
+          data: message.data,
+          nonce: message.nonce,
+        },
+      })
+      return decryptedMessage
     },
 
     async getAllTransactions(
@@ -129,10 +167,8 @@ interface IJupiterClientOpts {
   server: string
   address: string
   passphrase: string
-  publicKey: string
   encryptSecret: string
-  appId: string
-  appName?: string
+  publicKey?: string
   feeNQT?: number
   deadline?: number
   minimumTableBalance?: number
@@ -149,7 +185,14 @@ interface IRequestOpts {
 }
 
 interface ITransactionAttachment {
-  'version.OrdinaryPayment': number
+  [key: string]: any
+}
+
+interface ITransactionAttachmentDecryptedMessage {
+  data: string
+  nonce: string
+  isText: boolean
+  isCompressed: boolean
 }
 
 interface ITransaction {
@@ -178,8 +221,4 @@ interface ITransaction {
   recipient: string
   ecBlockHeight: number
   transaction: string
-}
-
-interface IStringMap {
-  [key: string]: any
 }

@@ -9,9 +9,7 @@ describe('JupiterClient', function() {
     server: 'https://jpr.gojupiter.tech',
     address: myAddy,
     passphrase: '',
-    publicKey: '',
     encryptSecret: '',
-    appId: '',
   })
 
   describe('#createNewAddress()', function() {
@@ -26,7 +24,7 @@ describe('JupiterClient', function() {
     it(`should get all transactions of type 0`, async () => {
       const txns = await client.getAllTransactions(false, 0)
       assert.strictEqual(txns.length > 0, true)
-      assert.strictEqual(txns[0].recipientRS, myAddy)
+      assert.strictEqual(txns.reverse()[0].recipientRS, myAddy)
     })
   })
 })

@@ -1,19 +1,52 @@
-import program from 'commander'
+import assert from 'assert'
+import { program } from 'commander'
+import Config from './libs/Config'
 import Commands from './commands'
 import Connectors from './connectors'
 ;(async function jpm() {
   try {
     program.version(require('../package.json').version, '-v, --version')
 
-    Object.keys(Commands).forEach((comm) => {
+    Commands.forEach((comm) => {
       // TODO: don't hard code connector
-      const commandFactory = (Commands as any)[comm](Connectors.jupiter)
-      program
-        .command(comm)
-        .description(commandFactory.help())
-        .action((...args) => {
-          commandFactory.run(...args)
-        })
+      const connector = Connectors.jupiter
+
+      const commandFactory = comm(connector)
+      const cmdrCommandInst = program.command(commandFactory.name)
+
+      cmdrCommandInst.description(commandFactory.help())
+
+      const options = (commandFactory.options && commandFactory.options()) || []
+      options.forEach((opt) => {
+        let method: 'option' | 'requiredOption' = 'option'
+        if (opt.isRequired) method = 'requiredOption'
+        cmdrCommandInst[method](opt.flag, opt.desc)
+      })
+
+      cmdrCommandInst.action(async (options) => {
+        try {
+          const currentConfig = await Config().checkAndPromptToCreateConfigFile()
+          if (typeof currentConfig === 'undefined') {
+            throw new Error(`There was a problem with your configuration file.`)
+          }
+          const confIsValid =
+            !connector.isConfigValid ||
+            (await connector.isConfigValid(currentConfig))
+          if (!confIsValid) {
+            if (commandFactory.name !== 'config') {
+              const configCommandFact = Commands.find(
+                (c) => c(connector).name === 'config'
+              )
+              assert(configCommandFact, 'config command factory not found')
+
+              await configCommandFact(connector).run(currentConfig, options)
+            }
+          }
+          await commandFactory.run(currentConfig, options)
+        } catch (err) {
+          console.error(`Error running command action`, err)
+        }
+      })
     })
 
     program.on('command:*', function invalidCommand() {

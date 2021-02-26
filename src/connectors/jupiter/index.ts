@@ -1,13 +1,14 @@
 import inquirer from 'inquirer'
 import JupiterClient from './JupiterClient'
+import { generatePassphrase } from './utils'
 
 export default JupiterConnector()
 
 export function JupiterConnector(): IFndrConnector {
   return {
-    async config(currentConfigStr: string) {
-      const currentConfig = JSON.parse(currentConfigStr || '{}')
-      const response = await inquirer.prompt([
+    async config(config: string) {
+      const currentConfig = JSON.parse(config || '{}')
+      let updatedConfig = await inquirer.prompt([
         {
           name: 'jupiterServer',
           message: `The Jupiter blockchain server URL.`,
@@ -16,13 +17,13 @@ export function JupiterConnector(): IFndrConnector {
         },
         {
           name: 'fundedAddress',
-          message: `The funded 'JUP-' address that we'll use to transact and add encrypted account information to the Jupiter blockchain.`,
+          message: `The funded 'JUP-XXX' address that we'll use to transact and add encrypted account information to the Jupiter blockchain.`,
           type: 'input',
           default: currentConfig.fundedAddress || '',
         },
         {
           name: 'fundedAddressPassphrase',
-          message: `The funded 'JUP-' address' passphrase. This is needed to allow funding your fndr address that stores your accounts.`,
+          message: `The funded 'JUP-XXX' address' passphrase. This is needed to allow funding your fndr address that stores your accounts.`,
           type: 'password',
           default: currentConfig.fundedAddressPassphrase || '',
         },
@@ -33,20 +34,121 @@ export function JupiterConnector(): IFndrConnector {
           default: currentConfig.encryptSecret || '',
         },
       ])
-      return JSON.stringify(response, null, 2)
+
+      if (!currentConfig.fndrAddress) {
+        const { allowAccountAddressCreation } = await inquirer.prompt([
+          {
+            name: 'allowAccountAddressCreation',
+            message: `Can we fund a new 'JUP-XXX' account with a tiny amount of $JUP to use to execute transactions to store your account information on the blockchain?`,
+            type: 'confirm',
+            default: currentConfig.allowAccountAddressCreation,
+          },
+        ])
+        if (allowAccountAddressCreation) {
+          const jupiterClient = getUserMainJupiterClient(
+            JSON.stringify(updatedConfig)
+          )
+          const newSecretPhrase = generatePassphrase()
+          const {
+            address,
+            publicKey,
+            account,
+          } = await jupiterClient.createNewAddress(newSecretPhrase)
+          await jupiterClient.sendMoney(
+            address,
+            updatedConfig.fundedAddressPassphrase
+          )
+
+          updatedConfig = {
+            ...updatedConfig,
+            fndrAddress: address,
+            fndrSecretPhrase: newSecretPhrase,
+            fndrPublicKey: publicKey,
+            fndrAccount: account,
+          }
+        }
+      }
+
+      return JSON.stringify(updatedConfig, null, 2)
     },
-    async searchAccounts(query: string) {
-      return []
+
+    async isConfigValid(config: string) {
+      const currentConfig = JSON.parse(config)
+      return (
+        currentConfig.fndrAddress &&
+        currentConfig.fndrSecretPhrase &&
+        currentConfig.fndrPublicKey &&
+        currentConfig.fndrAccount
+      )
     },
-    async getAccount(opts: IGetAccountOpts) {
+
+    async getAllAccounts(config: string) {
+      const client = getFndrJupiterClient(config)
+      const txns = await client.getAllTransactions()
+
+      const allRecords: IFndrAccount[] = (
+        await Promise.all(
+          txns.map(async (txn) => {
+            try {
+              const decryptedMessage = await client.decryptRecord(
+                txn.attachment.encryptedMessage
+              )
+              let account = JSON.parse(await client.decrypt(decryptedMessage))
+              if (!account[client.recordKey]) return false
+
+              delete account[client.recordKey]
+              return account
+            } catch (err) {
+              return { error: err }
+            }
+          })
+        )
+      ).filter((r) => !!r)
+
+      return allRecords
+    },
+
+    async getAccount(config: string, opts: IGetAccountOpts) {
+      const currentConfig = JSON.parse(config)
       return {
+        id: '',
         name: '',
         username: '',
         password: '',
       }
     },
-    async addAccount(acc: IFndrAccount) {},
-    async updateAccount(acc: IFndrAccount) {},
-    async deleteAccount(id: string) {},
+
+    async addAccount(config: string, account: IFndrAccount) {
+      await getFndrJupiterClient(config).storeRecord(account)
+    },
+
+    async updateAccount(config: string, acc: IFndrAccount) {
+      const currentConfig = JSON.parse(config)
+    },
+
+    async deleteAccount(config: string, id: string) {
+      const currentConfig = JSON.parse(config)
+    },
   }
+}
+
+function getUserMainJupiterClient(config: string) {
+  const currentConfig = JSON.parse(config)
+  return JupiterClient({
+    server: currentConfig.jupiterServer,
+    address: currentConfig.fundedAddress,
+    passphrase: currentConfig.fundedAddressPassphrase,
+    encryptSecret: currentConfig.encryptSecret,
+  })
+}
+
+function getFndrJupiterClient(config: string) {
+  const currentConfig = JSON.parse(config)
+  return JupiterClient({
+    server: currentConfig.jupiterServer,
+    address: currentConfig.fndrAddress,
+    publicKey: currentConfig.fndrPublicKey,
+    passphrase: currentConfig.fndrSecretPhrase,
+    encryptSecret: currentConfig.encryptSecret,
+  })
 }

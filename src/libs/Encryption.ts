@@ -80,7 +80,7 @@ export default function Encryption(options: IEncryptionOptions) {
         default:
           //true
           const compressedValue = await deflate(value)
-          return Buffer.from(compressedValue as any).toString('base64')
+          return Buffer.from(compressedValue).toString('base64')
       }
     },
   }
