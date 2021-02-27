@@ -30,7 +30,7 @@ export default function AddCommand(connector: IFndrConnector): IFndrCommand {
 
     async run(currentConfig: string, options: any) {
       let account: IFndrAccount = {
-        id: options.id || uuidv1(),
+        id: uuidv1(),
         name: options.name,
         username: options.username,
         extra: options.extra,

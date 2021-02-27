@@ -1,4 +1,9 @@
+interface IStringMap {
+  [key: string]: any
+}
+
 interface IFndrConnector {
+  name: string
   config(config: string): Promise<string>
   isConfigValid?(config: string): Promise<boolean>
   getAllAccounts(config: string, query?: string): Promise<IFndrAccount[]>
@@ -14,6 +19,11 @@ interface IFndrAccount {
   username?: string
   password?: string
   extra?: string
+  isDeleted?: boolean
+}
+
+interface IFndrAccountMap {
+  [id: string]: IFndrAccount
 }
 
 interface IGetAccountOpts {

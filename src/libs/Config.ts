@@ -5,13 +5,13 @@ import FileManagement from './FileManagement'
 
 const fileMgmt = FileManagement()
 
-export default function Config() {
+export default function Config(connectorName: string) {
   const homeDir =
     process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME']
   assert(homeDir, 'home directory was not found to store fndr configuration.')
 
   const confDir = path.join(homeDir, '.fndr')
-  const confFile = path.join(confDir, 'config.json')
+  const confFile = path.join(confDir, `${connectorName}.json`)
 
   return {
     confDir,

@@ -2,10 +2,11 @@ import Config from '../libs/Config'
 import FileManagement from '../libs/FileManagement'
 import Vomit from '../libs/Vomit'
 
-const config = Config()
 const fileMgmt = FileManagement()
 
 export default function ConfigCommand(connector: IFndrConnector): IFndrCommand {
+  const config = Config(connector.name)
+
   return {
     name: 'config',
 

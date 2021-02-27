@@ -1,7 +1,7 @@
 {
   "name": "fndr",
   "version": "0.0.1",
-  "description": "Password manager that stores your passwords encrypted on the Jupiter blockchain.",
+  "description": "Password manager that stores your information securely in the datastore of your choice through connectors.",
   "main": "./dist/fndrLibs.js",
   "repository": {
     "type": "git",
@@ -41,7 +41,10 @@
     "typescript": "^4.0.5"
   },
   "keywords": [
+    "blockchain",
     "cli",
+    "connector",
+    "jupiter",
     "password",
     "password manager",
     "secrets"

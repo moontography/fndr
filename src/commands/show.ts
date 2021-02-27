@@ -29,24 +29,13 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
     async run(currentConfig: string, options: any) {
       try {
         const { name, id, password } = options
-        if (!(name || id))
+        if (!(name || id)) {
           throw new Error(
             `At least a name or ID is required to get an account.`
           )
-
-        const accounts = await connector.getAllAccounts(currentConfig)
-        let account: undefined | IFndrAccount
-        if (id) {
-          account = accounts.find((a) => a.id === id)
-        } else {
-          account = accounts.find((a) => a.name === name)
         }
 
-        assert(
-          account,
-          `We didn't find an account matching the provided parameters.`
-        )
-
+        let account = await connector.getAccount(currentConfig, options)
         if (!password) {
           delete account.password
         }

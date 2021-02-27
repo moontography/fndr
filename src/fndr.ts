@@ -3,14 +3,15 @@ import { program } from 'commander'
 import Config from './libs/Config'
 import Commands from './commands'
 import Connectors from './connectors'
-;(async function jpm() {
+;(async function fndr() {
   try {
     program.version(require('../package.json').version, '-v, --version')
 
     Commands.forEach((comm) => {
-      // TODO: don't hard code connector
-      const connector = Connectors.jupiter
+      // TODO: dynamically get connector
+      const connectorName = 'jupiter'
 
+      const connector = Connectors[connectorName]
       const commandFactory = comm(connector)
       const cmdrCommandInst = program.command(commandFactory.name)
 
@@ -25,7 +26,9 @@ import Connectors from './connectors'
 
       cmdrCommandInst.action(async (options) => {
         try {
-          const currentConfig = await Config().checkAndPromptToCreateConfigFile()
+          const currentConfig = await Config(
+            connectorName
+          ).checkAndPromptToCreateConfigFile()
           if (typeof currentConfig === 'undefined') {
             throw new Error(`There was a problem with your configuration file.`)
           }

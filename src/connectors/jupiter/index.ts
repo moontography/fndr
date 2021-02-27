@@ -1,4 +1,6 @@
+import assert from 'assert'
 import inquirer from 'inquirer'
+import { v1 as uuidv1 } from 'uuid'
 import JupiterClient from './JupiterClient'
 import { generatePassphrase } from './utils'
 
@@ -6,6 +8,8 @@ export default JupiterConnector()
 
 export function JupiterConnector(): IFndrConnector {
   return {
+    name: 'jupiter',
+
     async config(config: string) {
       const currentConfig = JSON.parse(config || '{}')
       let updatedConfig = await inquirer.prompt([
@@ -23,7 +27,7 @@ export function JupiterConnector(): IFndrConnector {
         },
         {
           name: 'fundedAddressPassphrase',
-          message: `The funded 'JUP-XXX' address' passphrase. This is needed to allow funding your fndr address that stores your accounts.`,
+          message: `The funded 'JUP-XXX' address passphrase. This is needed to allow funding your fndr address that stores your accounts.`,
           type: 'password',
           default: currentConfig.fundedAddressPassphrase || '',
         },
@@ -69,7 +73,7 @@ export function JupiterConnector(): IFndrConnector {
         }
       }
 
-      return JSON.stringify(updatedConfig, null, 2)
+      return JSON.stringify({ ...currentConfig, ...updatedConfig }, null, 2)
     },
 
     async isConfigValid(config: string) {
@@ -86,7 +90,7 @@ export function JupiterConnector(): IFndrConnector {
       const client = getFndrJupiterClient(config)
       const txns = await client.getAllTransactions()
 
-      const allRecords: IFndrAccount[] = (
+      const allRecords: IFndrAccountMap = (
         await Promise.all(
           txns.map(async (txn) => {
             try {
@@ -103,31 +107,52 @@ export function JupiterConnector(): IFndrConnector {
             }
           })
         )
-      ).filter((r) => !!r)
+      )
+        .filter((r) => r)
+        .reduce(
+          (obj: IFndrAccountMap, acc: IFndrAccount) => ({
+            ...obj,
+            [acc.id]: { ...obj[acc.id], ...acc },
+          }),
+          {}
+        )
 
-      return allRecords
+      return Object.values(allRecords).filter((r) => !r.isDeleted)
     },
 
     async getAccount(config: string, opts: IGetAccountOpts) {
-      const currentConfig = JSON.parse(config)
-      return {
-        id: '',
-        name: '',
-        username: '',
-        password: '',
+      const { id, name } = opts
+      const accounts = await this.getAllAccounts(config)
+      let account: undefined | IFndrAccount
+      if (id) {
+        account = accounts.find((a) => a.id === id)
+      } else {
+        account = accounts.find((a) => a.name === name)
       }
+
+      assert(
+        account,
+        `We didn't find an account matching the provided parameters.`
+      )
+      return account
     },
 
     async addAccount(config: string, account: IFndrAccount) {
       await getFndrJupiterClient(config).storeRecord(account)
     },
 
-    async updateAccount(config: string, acc: IFndrAccount) {
-      const currentConfig = JSON.parse(config)
+    async updateAccount(config: string, account: IFndrAccount) {
+      await Promise.all([
+        this.deleteAccount(config, account.id),
+        this.addAccount(config, { ...account, id: uuidv1() }),
+      ])
     },
 
     async deleteAccount(config: string, id: string) {
-      const currentConfig = JSON.parse(config)
+      const accounts = await this.getAllAccounts(config)
+      const account = accounts.find((a) => a.id === id)
+      assert(account, `We didn't find an account matching the ID provided.`)
+      await getFndrJupiterClient(config).storeRecord({ id, isDeleted: true })
     },
   }
 }
