@@ -1,6 +1,6 @@
 {
   "name": "fndr",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Password manager that stores your information securely in the datastore of your choice through connectors.",
   "main": "./dist/fndrLibs.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/whatl3y/fndr"
   },
   "bin": {
-    "fndr": "./dist/fndr.js"
+    "fndr": "dist/fndr.js"
   },
   "scripts": {
     "build": "tsc && gulp index",
