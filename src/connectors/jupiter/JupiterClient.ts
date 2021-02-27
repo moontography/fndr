@@ -77,11 +77,13 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
       return data
     },
 
-    async parseEncryptedRecord(cipherText: string): Promise<IFndrAccount> {
+    // async parseEncryptedRecord(cipherText: string): Promise<IFndrAccount> {
+    async parseEncryptedRecord(cipherText: string): Promise<any> {
       return JSON.parse(await this.decrypt(cipherText))
     },
 
-    async storeRecord(record: IStringMap) {
+    // async storeRecord(record: IStringMap) {
+    async storeRecord(record: any) {
       const { data } = await this.request('post', '/nxt', {
         params: {
           requestType: 'sendMessage',
