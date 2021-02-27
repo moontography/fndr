@@ -124,3 +124,7 @@ $ # now you can run commands with the locally built entry point
 $ # example:
 $ node dist/fndr search -q facebook
 ```
+
+## Quick Note
+
+I consider this a rebuild of my [hide](https://github.com/whatl3y/hide) password manager and will soon create a file system connector that will do almost exactly as that repo does. At that point in time I might rename this repo back to `hide` or leave it alone, I haven't really decided yet :)

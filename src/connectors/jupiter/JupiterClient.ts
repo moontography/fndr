@@ -62,7 +62,7 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
       return { address, publicKey, requestProcessingTime, account }
     },
 
-    async sendMoney(recipientAddr: string, sendingAddr: string = opts.address) {
+    async sendMoney(recipientAddr: string) {
       const { data } = await this.request('post', '/nxt', {
         params: {
           requestType: 'sendMoney',

@@ -58,10 +58,7 @@ export function JupiterConnector(): IFndrConnector {
             publicKey,
             account,
           } = await jupiterClient.createNewAddress(newSecretPhrase)
-          await jupiterClient.sendMoney(
-            address,
-            updatedConfig.fundedAddressPassphrase
-          )
+          await jupiterClient.sendMoney(address)
 
           updatedConfig = {
             ...updatedConfig,
