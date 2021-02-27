@@ -73,7 +73,12 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
           deadline: CONF.deadline,
         },
       })
-      if (data.signatureHash === null) throw new Error(data)
+      if (
+        data.signatureHash === null ||
+        (data.errorCode && data.errorCode !== 0)
+      ) {
+        throw new Error(JSON.stringify(data))
+      }
       return data
     },
 
