@@ -6,12 +6,10 @@ import Connectors from './connectors'
 ;(async function fndr() {
   try {
     program.version(require('../package.json').version, '-v, --version')
+    const connectorName = await Config().getConnector()
 
     Commands.forEach((comm) => {
-      // TODO: dynamically get connector
-      const connectorName = 'jupiter'
-
-      const connector = Connectors[connectorName]
+      const connector = Connectors[connectorName || 'filesystem']
       const commandFactory = comm(connector)
       const cmdrCommandInst = program.command(commandFactory.name)
 

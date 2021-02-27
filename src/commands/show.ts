@@ -21,14 +21,18 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
         },
         {
           flag: '-p, --password',
-          desc: 'whether to show the password of your account in the terminal.',
+          desc: 'include the password of your account in the terminal.',
+        },
+        {
+          flag: '-P --password-only',
+          desc: 'only output the password, good for piping to other commands.',
         },
       ]
     },
 
     async run(currentConfig: string, options: any) {
       try {
-        const { name, id, password } = options
+        const { name, id, password, passwordOnly } = options
         if (!(name || id)) {
           throw new Error(
             `At least a name or ID is required to get an account.`
@@ -36,6 +40,10 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
         }
 
         let account = await connector.getAccount(currentConfig, options)
+        if (passwordOnly) {
+          process.stdout.write(account.password || '')
+          return
+        }
         if (!password) {
           delete account.password
         }

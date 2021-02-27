@@ -1,8 +1,20 @@
 # fndr
 
-Flexible and secure password manager that gives you complete control of your account information. fndr supports customized connectors that determine where to store your account information.
+Flexible and secure (AES-256 bit encryption) password manager that gives you complete control of your account information. fndr supports customized connectors that tell fndr where to store your encrypted account information.
 
-The default connector is the [Jupiter connector](#jupiter-default) that encrypts and stores account information on the Jupiter blockchain.
+The default connector is the [filesystem connector](#filesystem-default) that encrypts and stores account information on your local file system.
+
+## Highlight: Jupiter blockchain connector
+
+The [Jupiter connector](#jupiter) supports storing your accounts on chain in a decentralized manner on the Jupiter blockchain with military grade encryption in place.
+
+## Note on >=0.1.0 breaking change
+
+Prior to v0.1.0 being released the default connector that was used was the [`Jupiter`](#jupiter) connector. Now the default connector is `filesystem`, so if upgrade to >=0.1.0 you need to run the following command to use the `jupiter` connector.
+
+```sh
+$ fndr use jupiter
+```
 
 ## Requirements
 
@@ -36,7 +48,15 @@ $ fndr file
 Your configuration file is in the following location:
 /Users/moontology/.fndr/jupiter.json
 
-$
+$ # get current connector being used
+$ fndr connector
+filesystem
+
+$ # setup fndr to use a particular connector (DEFAULT is 'filesystem')
+$ fndr use -c jupiter
+Successfully changed connector to 'jupiter'!
+
+
 $ # add new facebook account
 $ fndr add -n facebook -u my.email@gmail.com
 ? The password for account: facebook. [hidden] [input is hidden]
@@ -81,8 +101,7 @@ $ node dist/fndr update -n facebook -e "this is my main account"
 
 Successfully updated account: 'facebook'!
 
-$ # delete an account from the fndr database (can delete by account name or ID)
-$ fndr delete -n facebook
+$ # delete an account from the fndr database (requires entering the ID)
 $ fndr delete -i 7cc821a0-7866-11eb-9e3a-6725a812df0e
 Successfully deleted account: '7cc821a0-7866-11eb-9e3a-6725a812df0e'.
 
@@ -92,9 +111,21 @@ Successfully deleted account: '7cc821a0-7866-11eb-9e3a-6725a812df0e'.
 
 Connectors are interfaces that support storing your encrypted account information in different data sources. This could range from a blockchain, SQL database, Redis, your file system, etc. The possibilities are endless, and you can refer to the types to understand the interface needed to build your own connector(s).
 
-### Jupiter (default)
+### `filesystem` (default)
+
+Store account information securely on your machine that is AES-256 bit encrypted with a secret you provide. When running fndr for the first time, you'll be prompted to enter a secret/password that will be used to encrypt your data. Do not lose this secret in case you need to recover your passwords later!
+
+```sh
+$ fndr use -c filesystem
+```
+
+### `jupiter`
 
 Store account information securely on the Jupiter blockchain.
+
+```sh
+$ fndr use -c jupiter
+```
 
 #### Requirements
 
@@ -102,6 +133,10 @@ Store account information securely on the Jupiter blockchain.
   - _When we say "funded", we mean you need a VERY TINY amount of JUP in this address. We attempt to fund a newly created account that will be used to store transactions with your encrypted account data with 0.0005 JUP (50000 NQT), which as of the time of writing is fractions of a cent in USD._
 
 ### We want your ideas and PRs for new connectors!
+
+#### TODO
+
+Today if you've been using a connector and would like to switch to a different one, your accounts are not ported over to the new connector. We will add this functionality soon.
 
 ## Development
 
@@ -128,3 +163,12 @@ $ node dist/fndr search -q facebook
 ## Quick Note
 
 I consider this a rebuild of my [hide](https://github.com/whatl3y/hide) password manager and will soon create a file system connector that will do almost exactly as that repo does. At that point in time I might rename this repo back to `hide` or leave it alone, I haven't really decided yet :)
+
+# Tips w/ cryptocurrency
+
+I love FOSS (free and open source software) and for the most part don't want to charge for the software I build. It does however take a good bit of time keeping up with feature requests and bug fixes, so if you have the desire and ability to send me a free coffee, it would be greatly appreciated!
+
+- Bitcoin (BTC): `3D779dP5SZo4szHivWHyFd6J2ESumwDmph`
+- Ethereum (ETH and ERC-20 tokens): `0xF3ffa9706b3264EDd1DAa93D5F5D70C8f71fAc99`
+- Stellar (XLM): `GACH6YMYFZ574FSGCV7IJXTGETEQL3DLQK64Z6DFGD57PZL5RH6LYOJT`
+- Jupiter (JUP) mainnet: `JUP-TUWZ-4B8Z-9REP-2YVH5`

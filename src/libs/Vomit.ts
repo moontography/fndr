@@ -4,15 +4,6 @@ import columnify from 'columnify'
 const NOOP = () => {}
 
 export default {
-  noCryptSecret() {
-    this.wrapInNewlines(() => {
-      console.log(`You don't have environment variable CRYPT_SECRET set.`.red)
-      console.log(
-        `>export CRYPT_SECRET=[your all time master secret value]`.green
-      )
-    })
-  },
-
   listSingleAccount(accountRecord: IFndrAccount) {
     this.wrapInNewlines(() =>
       console.log(this.columnify([accountRecord]).green)
