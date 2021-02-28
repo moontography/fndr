@@ -28,7 +28,7 @@ export default function AddCommand(connector: IFndrConnector): IFndrCommand {
       ]
     },
 
-    async run(currentConfig: string, options: any) {
+    async execute(currentConfig: string, options: any) {
       let account: IFndrAccount = {
         id: uuidv1(),
         name: options.name,
@@ -47,6 +47,11 @@ export default function AddCommand(connector: IFndrConnector): IFndrCommand {
       account.password = password || undefined
 
       await connector.addAccount(currentConfig, account)
+      return account
+    },
+
+    async runCli(currentConfig: string, options: any) {
+      const account = await this.execute(currentConfig, options)
       Vomit.success(`Successfully added account '${account.name}'!`)
     },
   }

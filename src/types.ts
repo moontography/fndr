@@ -34,7 +34,8 @@ interface IGetAccountOpts {
 interface IFndrCommand {
   name: string
   help(): string
-  run(config: any, options?: any): Promise<void>
+  execute(config: string, options?: any): any
+  runCli(config: string, options?: any): Promise<void>
   options?(): IFndrCommandOptions[]
 }
 

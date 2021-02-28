@@ -39,6 +39,15 @@ export function JupiterConnector(): IFndrConnector {
         },
       ])
 
+      // set defaults for the fndrAddress which is used to store accounts
+      updatedConfig = {
+        ...updatedConfig,
+        fndrAddress: updatedConfig.fundedAddress,
+        fndrSecretPhrase: updatedConfig.fundedAddressPassphrase,
+        // fndrPublicKey: publicKey,
+        // fndrAccount: account,
+      }
+
       if (!currentConfig.fndrAddress) {
         const { allowAccountAddressCreation } = await inquirer.prompt([
           {

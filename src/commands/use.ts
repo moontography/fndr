@@ -21,24 +21,25 @@ export default function UseCommand(connector: IFndrConnector): IFndrCommand {
       ]
     },
 
-    async run(currentConfig: string, options: any) {
-      try {
-        let { connector: conn } = options
-        const configInst = Config(connector.name)
+    async execute(currentConfig: string, options: any) {
+      let { connector: conn } = options
+      const configInst = Config(connector.name)
 
-        conn = conn.toLowerCase()
+      conn = conn.toLowerCase()
 
-        const allSupportConnectors = Object.keys(Connectors)
-        assert(
-          allSupportConnectors.includes(conn),
-          `Supported connectors are:\n\n${allSupportConnectors.join('\n')}`
-        )
+      const allSupportConnectors = Object.keys(Connectors)
+      assert(
+        allSupportConnectors.includes(conn),
+        `Supported connectors are:\n\n${allSupportConnectors.join('\n')}`
+      )
 
-        await configInst.changeConnector(conn)
-        Vomit.success(`Successfully changed connector to '${conn}'!`)
-      } catch (err) {
-        Vomit.error(`${err.name} - ${err.message}`)
-      }
+      await configInst.changeConnector(conn)
+      return conn
+    },
+
+    async runCli(currentConfig: string, options: any) {
+      const conn = await this.execute(currentConfig, options)
+      Vomit.success(`Successfully changed connector to '${conn}'!`)
     },
   }
 }

@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { program } from 'commander'
 import Config from './libs/Config'
+import Vomit from './libs/Vomit'
 import Commands from './commands'
 import Connectors from './connectors'
 ;(async function fndr() {
@@ -40,12 +41,12 @@ import Connectors from './connectors'
               )
               assert(configCommandFact, 'config command factory not found')
 
-              await configCommandFact(connector).run(currentConfig, options)
+              await configCommandFact(connector).runCli(currentConfig, options)
             }
           }
-          await commandFactory.run(currentConfig, options)
+          await commandFactory.runCli(currentConfig, options)
         } catch (err) {
-          console.error(`Error running command action`, err)
+          Vomit.error(`${err.name} - ${err.message}`)
         }
       })
     })

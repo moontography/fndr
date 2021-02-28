@@ -1,4 +1,3 @@
-import assert from 'assert'
 import Vomit from '../libs/Vomit'
 
 export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
@@ -30,27 +29,26 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
       ]
     },
 
-    async run(currentConfig: string, options: any) {
-      try {
-        const { name, id, password, passwordOnly } = options
-        if (!(name || id)) {
-          throw new Error(
-            `At least a name or ID is required to get an account.`
-          )
-        }
-
-        let account = await connector.getAccount(currentConfig, options)
-        if (passwordOnly) {
-          process.stdout.write(account.password || '')
-          return
-        }
-        if (!password) {
-          delete account.password
-        }
-        Vomit.listSingleAccount(account)
-      } catch (err) {
-        Vomit.error(`${err.name} - ${err.message}`)
+    async execute(currentConfig: string, options: any) {
+      const { name, id, password, passwordOnly } = options
+      if (!(name || id)) {
+        throw new Error(`At least a name or ID is required to get an account.`)
       }
+
+      let account = await connector.getAccount(currentConfig, options)
+      if (passwordOnly) {
+        process.stdout.write(account.password || '')
+        return
+      }
+      if (!password) {
+        delete account.password
+      }
+      return account
+    },
+
+    async runCli(currentConfig: string, options: any) {
+      const account = await this.execute(currentConfig, options)
+      Vomit.listSingleAccount(account)
     },
   }
 }

@@ -17,30 +17,36 @@ export default function SearchCommand(connector: IFndrConnector): IFndrCommand {
       ]
     },
 
-    async run(currentConfig: string, options: any) {
+    async execute(currentConfig: string, options: any) {
       const { query } = options
-      const matches = await connector.getAllAccounts(currentConfig)
-      const nameMatches = searchForAccountsByField(matches, 'name', query)
+      const allAccounts = await connector.getAllAccounts(currentConfig)
+      const nameMatches = searchForAccountsByField(allAccounts, 'name', query)
       const usernameMatches = searchForAccountsByField(
-        matches,
+        allAccounts,
         'username',
         query
       )
-      Vomit.listAccounts(
-        nameMatches
-          .concat(usernameMatches)
-          .sort(sortByName)
-          .reduce((acc: IFndrAccount[], val: IFndrAccount) => {
-            if (acc.indexOf(val) === -1) acc.push(val)
-            return acc
-          }, []),
-        matches.length
+      const filteredMatches = nameMatches
+        .concat(usernameMatches)
+        .sort(sortByName)
+        .reduce((acc: IFndrAccount[], val: IFndrAccount) => {
+          if (acc.indexOf(val) === -1) acc.push(val)
+          return acc
+        }, [])
+      return [filteredMatches, allAccounts]
+    },
+
+    async runCli(currentConfig: string, options: any) {
+      const [filteredAccounts, allAccounts] = await this.execute(
+        currentConfig,
+        options
       )
+      Vomit.listAccounts(filteredAccounts, allAccounts.length)
     },
   }
 }
 
-function sortByName(acc1: IFndrAccount, acc2: IFndrAccount) {
+export function sortByName(acc1: IFndrAccount, acc2: IFndrAccount) {
   return acc1.name.toLowerCase() < acc2.name.toLowerCase() ? -1 : 1
 }
 

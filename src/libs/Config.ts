@@ -1,5 +1,6 @@
 import assert from 'assert'
 import path from 'path'
+import dayjs from 'dayjs'
 import inquirer from 'inquirer'
 import FileManagement from './FileManagement'
 import { IConnectors } from '../connectors'
@@ -73,6 +74,13 @@ export default function Config(connectorName?: string) {
         : await fileMgmt.getLocalFile(this.connectorFile, 'utf8')
       assert(typeof conn === 'string', `connector wasn't returned as a string`)
       return conn as IConnectors
+    },
+
+    async exportAccounts(accounts: IFndrAccount[]) {
+      await fileMgmt.checkAndCreateDirectoryOrFile(confDir)
+      const exportFile = path.join(confDir, `export_${dayjs().unix()}.json`)
+      await fileMgmt.writeFile(exportFile, JSON.stringify(accounts, null, 2))
+      return exportFile
     },
   }
 }

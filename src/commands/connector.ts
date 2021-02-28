@@ -1,4 +1,3 @@
-import Config from '../libs/Config'
 import Vomit from '../libs/Vomit'
 
 export default function ConnectorCommand(
@@ -15,8 +14,12 @@ export default function ConnectorCommand(
       return []
     },
 
-    async run() {
-      Vomit.success(connector.name)
+    async execute() {
+      return connector.name
+    },
+
+    async runCli() {
+      Vomit.success(await this.execute(''))
     },
   }
 }

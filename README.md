@@ -79,6 +79,10 @@ $ fndr show -n facebook -p
 ID                                   NAME            PASSWORD
 7cc821a0-7866-11eb-9e3a-6725a812df0e facebook        thePassword
 
+$ # with the `-P` (capital P) parameter, only show the password for command piping support
+$ fndr show -n facebook -P
+thePassword
+
 $ # find account by ID
 $ fndr show -i 7cc821a0-7866-11eb-9e3a-6725a812df0e
 ID                                   NAME
@@ -103,6 +107,14 @@ Successfully updated account: 'facebook'!
 $ # delete an account from the fndr database (requires entering the ID)
 $ fndr delete -i 7cc821a0-7866-11eb-9e3a-6725a812df0e
 Successfully deleted account: '7cc821a0-7866-11eb-9e3a-6725a812df0e'.
+
+$ # export all your accounts on your machine in a JSON file.
+$ # THIS CONTAINS ALL YOUR ACCOUNTS AND PASSWORDS UNENCRYPTED SO BE CAREFUL WHAT YOU DO WITH THIS
+$ fndr export
+You're export was created in the following location.
+NOTE: this contains your account information unencrypted so keep it in a safe place!
+
+/Users/moontography/.fndr/export_1614540410.json
 
 ```
 

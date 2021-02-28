@@ -13,10 +13,14 @@ export default function FileCommand(connector: IFndrConnector): IFndrCommand {
       return []
     },
 
-    async run() {
+    async execute() {
+      return Config(connector.name).confFile
+    },
+
+    async runCli() {
       Vomit.twoLinesDifferentColors(
         `Your configuration file is in the following location:`,
-        Config(connector.name).confFile,
+        await this.execute(''),
         'blue',
         'green'
       )
