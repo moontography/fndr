@@ -75,7 +75,7 @@ export default function AccountMgmt(
     async findAccountByUuid(uid: string) {
       const currentAccounts = await fileHandler.getAndDecryptFlatFile()
       if (!(currentAccounts && currentAccounts[uid])) return false
-      return Object.assign(currentAccounts[uid], { uuid: uid })
+      return Object.assign(currentAccounts[uid], { id: uid })
     },
 
     async findAccountByName(name: string) {
@@ -88,7 +88,7 @@ export default function AccountMgmt(
 
       if (!matchingUuid) return false
       return Object.assign(currentAccounts[matchingUuid], {
-        uuid: matchingUuid,
+        id: matchingUuid,
       })
     },
 
@@ -138,10 +138,10 @@ export default function AccountMgmt(
             const searchRegexp = new RegExp(searchString, 'i')
             const fieldMatches =
               account[field] && searchRegexp.test(account[field])
-            if (fieldMatches) return Object.assign(account, { uuid: uuid })
+            if (fieldMatches) return Object.assign(account, { id: uuid })
             return null
           }
-          return Object.assign(account, { uuid: uuid })
+          return Object.assign(account, { id: uuid })
         })
         .filter((info) => !!info)
 

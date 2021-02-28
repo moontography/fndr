@@ -6,19 +6,19 @@ The default connector is the [filesystem connector](#filesystem-default) that en
 
 ## Highlight: Jupiter blockchain connector
 
-The [Jupiter connector](#jupiter) supports storing your accounts on chain in a decentralized manner on the Jupiter blockchain with military grade encryption in place.
+The [Jupiter connector](#jupiter) supports storing your accounts on chain in a decentralized and secure manner using AES encryption on the Jupiter blockchain.
 
 ## Note on >=0.1.0 breaking change
 
-Prior to v0.1.0 being released the default connector that was used was the [`Jupiter`](#jupiter) connector. Now the default connector is `filesystem`, so if upgrade to >=0.1.0 you need to run the following command to use the `jupiter` connector.
+Prior to v0.1.0 the default connector was the [`jupiter`](#jupiter) connector. Now the default connector is `filesystem`, so if upgrade to >=0.1.0 you need to run the following command to use the `jupiter` connector.
 
 ```sh
-$ fndr use jupiter
+$ fndr use -c jupiter
 ```
 
 ## Requirements
 
-[Node.js](https://nodejs.org/en/), preferrably the current LTS version, and NPM installed (NPM get's shipped with a fresh Node.js install)
+[Node.js](https://nodejs.org/en/), ideally the LTS version, and NPM installed (NPM get's shipped with a fresh Node.js install)
 
 ## Install
 
@@ -26,7 +26,7 @@ $ fndr use jupiter
 $ npm install -g fndr
 ```
 
-If installed successfully, you should be able to get the fndr version:
+If successful, you should be able to get the fndr version:
 
 ```sh
 $ fndr -v
@@ -55,7 +55,6 @@ filesystem
 $ # setup fndr to use a particular connector (DEFAULT is 'filesystem')
 $ fndr use -c jupiter
 Successfully changed connector to 'jupiter'!
-
 
 $ # add new facebook account
 $ fndr add -n facebook -u my.email@gmail.com
@@ -162,7 +161,7 @@ $ node dist/fndr search -q facebook
 
 ## Quick Note
 
-I consider this a rebuild of my [hide](https://github.com/whatl3y/hide) password manager and will soon create a file system connector that will do almost exactly as that repo does. At that point in time I might rename this repo back to `hide` or leave it alone, I haven't really decided yet :)
+fndr with the `filesystem` connector is basically a rebuild of [hide](https://github.com/whatl3y/hide) password manager. I'm still decided whether to rename this repo back to `hide` and provide clear migration steps from it or leave fndr alone, I haven't really decided yet :)
 
 # Tips w/ cryptocurrency
 

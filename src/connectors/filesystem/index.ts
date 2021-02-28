@@ -15,7 +15,7 @@ function FileSystemConnector(): IFndrConnector {
         {
           name: 'encryptSecret',
           message: `The encryption secret (any alphanumeric characters you'd like) that will be used to encrypt record information.`,
-          type: 'input',
+          type: 'password',
           default: currentConfig.encryptSecret || uuidv1(),
         },
       ])
@@ -48,7 +48,7 @@ function FileSystemConnector(): IFndrConnector {
 
       if (uid) {
         const account = await accountMgmt.findAccountByUuid(uid)
-        assert(account, `We didn't find an account with uuid: ${uid}`)
+        assert(account, `We didn't find an account with ID: ${uid}`)
         return account
       } else if (name) {
         const nameStringToTry = name
@@ -58,7 +58,7 @@ function FileSystemConnector(): IFndrConnector {
       }
 
       throw new Error(
-        'Either a name (-n or --name) or uuid (-i or --id or --uuid) parameter is a required at a minimum to show the details for an account.'
+        'Either a name (-n or --name) or ID (-i or --id) parameter is a required at a minimum to show the details for an account.'
       )
     },
 
@@ -89,7 +89,7 @@ function FileSystemConnector(): IFndrConnector {
       const accountMgmt = AccountMgmt(this, currentConfig.encryptSecret)
       assert(
         await accountMgmt.deleteAccountByUuid(id),
-        `We didn't find an account with uuid: '${id}'`
+        `We didn't find an account with ID: '${id}'`
       )
     },
   }
