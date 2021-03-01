@@ -39,16 +39,16 @@ export function JupiterConnector(): IFndrConnector {
         },
       ])
 
-      // set defaults for the fndrAddress which is used to store accounts
-      updatedConfig = {
-        ...updatedConfig,
-        fndrAddress: updatedConfig.fundedAddress,
-        fndrSecretPhrase: updatedConfig.fundedAddressPassphrase,
-        // fndrPublicKey: publicKey,
-        // fndrAccount: account,
-      }
-
       if (!currentConfig.fndrAddress) {
+        // set defaults for the fndrAddress which is used to store accounts
+        updatedConfig = {
+          ...updatedConfig,
+          fndrAddress: updatedConfig.fundedAddress,
+          fndrSecretPhrase: updatedConfig.fundedAddressPassphrase,
+          // fndrPublicKey: publicKey,
+          // fndrAccount: account,
+        }
+
         const { allowAccountAddressCreation } = await inquirer.prompt([
           {
             name: 'allowAccountAddressCreation',
@@ -105,7 +105,7 @@ export function JupiterConnector(): IFndrConnector {
               if (!account[client.recordKey]) return false
 
               delete account[client.recordKey]
-              return account
+              return { ...account, meta: txn.transaction }
             } catch (err) {
               return { error: err }
             }

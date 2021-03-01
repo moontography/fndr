@@ -20,6 +20,7 @@ interface IFndrAccount {
   password?: string
   extra?: string
   isDeleted?: boolean
+  meta?: string
 }
 
 interface IFndrAccountMap {
