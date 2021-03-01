@@ -107,12 +107,12 @@ export function JupiterConnector(): IFndrConnector {
               delete account[client.recordKey]
               return { ...account, meta: txn.transaction }
             } catch (err) {
-              return { error: err }
+              return false
             }
           })
         )
       )
-        .filter((r) => r)
+        .filter((r) => !!r)
         .reduce(
           (obj: IFndrAccountMap, acc: IFndrAccount) => ({
             ...obj,
