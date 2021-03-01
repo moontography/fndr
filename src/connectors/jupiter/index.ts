@@ -161,7 +161,7 @@ export function JupiterConnector(): IFndrConnector {
   }
 }
 
-export async function getNewJupiterAddress(config: string): Promise<any> {
+export async function getNewJupiterAddress(config: IStringMap): Promise<any> {
   const jupiterClient = getUserMainJupiterClient(JSON.stringify(config))
   const newSecretPhrase = generatePassphrase()
   const info = await jupiterClient.createNewAddress(newSecretPhrase)
