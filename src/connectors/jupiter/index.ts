@@ -58,15 +58,13 @@ export function JupiterConnector(): IFndrConnector {
           },
         ])
         if (allowAccountAddressCreation) {
-          const jupiterClient = getUserMainJupiterClient(
-            JSON.stringify(updatedConfig)
-          )
-          const newSecretPhrase = generatePassphrase()
           const {
+            jupiterClient,
             address,
             publicKey,
             account,
-          } = await jupiterClient.createNewAddress(newSecretPhrase)
+            newSecretPhrase,
+          } = await getNewJupiterAddress(updatedConfig)
           await jupiterClient.sendMoney(address)
 
           updatedConfig = {
@@ -161,6 +159,13 @@ export function JupiterConnector(): IFndrConnector {
       await getFndrJupiterClient(config).storeRecord({ id, isDeleted: true })
     },
   }
+}
+
+export async function getNewJupiterAddress(config: string): Promise<any> {
+  const jupiterClient = getUserMainJupiterClient(JSON.stringify(config))
+  const newSecretPhrase = generatePassphrase()
+  const info = await jupiterClient.createNewAddress(newSecretPhrase)
+  return { ...info, jupiterClient, newSecretPhrase }
 }
 
 function getUserMainJupiterClient(config: string) {
