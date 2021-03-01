@@ -3,7 +3,6 @@
   "version": "0.1.2",
   "description": "Password manager that stores your information securely in the datastore of your choice through connectors.",
   "main": "./dist/fndrLibs.js",
-  "types": "./dist/types.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/whatl3y/fndr"

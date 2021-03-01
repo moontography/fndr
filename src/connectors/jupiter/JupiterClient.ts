@@ -7,8 +7,8 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
   const CONF = {
     feeNQT: opts.feeNQT || 100,
     deadline: opts.deadline || 60,
-    minimumTableBalance: opts.minimumTableBalance || 50000,
-    minimumAppBalance: opts.minimumAppBalance || 100000,
+    minimumFndrAccountBalance: opts.minimumFndrAccountBalance || 50000,
+    minimumUserAccountBalance: opts.minimumUserAccountBalance || 100000,
     moneyDecimals: opts.moneyDecimals || 8,
   }
 
@@ -68,7 +68,7 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
           requestType: 'sendMoney',
           secretPhrase: opts.passphrase,
           recipient: recipientAddr,
-          amountNQT: CONF.minimumTableBalance,
+          amountNQT: CONF.minimumFndrAccountBalance,
           feeNQT: CONF.feeNQT,
           deadline: CONF.deadline,
         },
@@ -178,8 +178,8 @@ interface IJupiterClientOpts {
   publicKey?: string
   feeNQT?: number
   deadline?: number
-  minimumTableBalance?: number
-  minimumAppBalance?: number
+  minimumFndrAccountBalance?: number
+  minimumUserAccountBalance?: number
   moneyDecimals?: number
 }
 

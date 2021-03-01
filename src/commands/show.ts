@@ -38,7 +38,7 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
       let account = await connector.getAccount(currentConfig, options)
       if (passwordOnly) {
         process.stdout.write(account.password || '')
-        return
+        return false
       }
       if (!password) {
         delete account.password
@@ -48,6 +48,7 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
 
     async runCli(currentConfig: string, options: any) {
       const account = await this.execute(currentConfig, options)
+      if (!account) return
       Vomit.listSingleAccount(account)
     },
   }
