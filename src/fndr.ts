@@ -46,7 +46,7 @@ import Connectors from './connectors'
           }
           await commandFactory.runCli(currentConfig, options)
         } catch (err) {
-          Vomit.error(`${err.name} - ${err.message}`)
+          Vomit.error(`${err.name} - ${err.message} - ${err.stack}`)
         }
       })
     })

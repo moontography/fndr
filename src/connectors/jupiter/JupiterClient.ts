@@ -5,7 +5,7 @@ import Encryption from '../../libs/Encryption'
 export default function JupiterClient(opts: IJupiterClientOpts) {
   const encryption = Encryption({ secret: opts.encryptSecret })
   const CONF = {
-    feeNQT: opts.feeNQT || 100,
+    feeNQT: opts.feeNQT || 150,
     deadline: opts.deadline || 60,
     minimumFndrAccountBalance: opts.minimumFndrAccountBalance || 50000,
     minimumUserAccountBalance: opts.minimumUserAccountBalance || 100000,
@@ -106,7 +106,8 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
           compressMessageToEncrypt: true,
         },
       })
-      if (data.errorCode && data.errorCode !== 0) throw new Error(data)
+      if (data.errorCode && data.errorCode !== 0)
+        throw new Error(JSON.stringify(data))
       return data
     },
 
