@@ -35,7 +35,14 @@ export default function ShowCommand(connector: IFndrConnector): IFndrCommand {
         throw new Error(`At least a name or ID is required to get an account.`)
       }
 
-      let account = await connector.getAccount(currentConfig, options)
+      let account = await connector.getAccount(
+        currentConfig,
+        options,
+
+        // provides a way to pass a list of accounts to override in #getAccount
+        // instead of getting all accounts and filtering from them
+        options.accountListOverride
+      )
       if (passwordOnly) {
         process.stdout.write(account.password || '')
         return false

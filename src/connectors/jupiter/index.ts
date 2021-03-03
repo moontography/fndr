@@ -124,9 +124,14 @@ export function JupiterConnector(): IFndrConnector {
       return Object.values(allRecords).filter((r) => !r.isDeleted)
     },
 
-    async getAccount(config: string, opts: IGetAccountOpts) {
+    async getAccount(
+      config: string,
+      opts: IGetAccountOpts,
+      accountListOverride?: IFndrAccount[]
+    ) {
       const { id, name } = opts
-      const accounts = await this.getAllAccounts(config)
+      const accounts =
+        accountListOverride || (await this.getAllAccounts(config))
       let account: undefined | IFndrAccount
       if (id) {
         account = accounts.find((a) => a.id === id)

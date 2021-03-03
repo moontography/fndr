@@ -7,7 +7,11 @@ interface IFndrConnector {
   config(config: string): Promise<string>
   isConfigValid?(config: string): Promise<boolean>
   getAllAccounts(config: string, query?: string): Promise<IFndrAccount[]>
-  getAccount(config: string, opts: IGetAccountOpts): Promise<IFndrAccount>
+  getAccount(
+    config: string,
+    opts: IGetAccountOpts,
+    extra?: any
+  ): Promise<IFndrAccount>
   addAccount(config: string, acc: IFndrAccount): Promise<void>
   updateAccount(config: string, acc: IFndrAccount): Promise<void>
   deleteAccount(config: string, id: string): Promise<void>
