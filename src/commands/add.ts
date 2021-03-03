@@ -33,25 +33,31 @@ export default function AddCommand(connector: IFndrConnector): IFndrCommand {
         id: uuidv1(),
         name: options.name,
         username: options.username,
+        password: options.password,
         extra: options.extra,
       }
 
-      const { password } = await inquirer.prompt([
-        {
-          name: 'password',
-          message: `The password for account: ${account.name}.`,
-          type: 'password',
-          default: '',
-        },
-      ])
-      account.password = password || undefined
+      if (options.isCli) {
+        const { password } = await inquirer.prompt([
+          {
+            name: 'password',
+            message: `The password for account: ${account.name}.`,
+            type: 'password',
+            default: '',
+          },
+        ])
+        account.password = password || undefined
+      }
 
       await connector.addAccount(currentConfig, account)
       return account
     },
 
     async runCli(currentConfig: string, options: any) {
-      const account = await this.execute(currentConfig, options)
+      const account = await this.execute(currentConfig, {
+        ...options,
+        isCli: true,
+      })
       Vomit.success(`Successfully added account '${account.name}'!`)
     },
   }
