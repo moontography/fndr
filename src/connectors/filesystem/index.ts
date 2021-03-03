@@ -30,10 +30,12 @@ function FileSystemConnector(): IFndrConnector {
     async getAllAccounts(config: string): Promise<IFndrAccount[]> {
       const currentConfig = JSON.parse(config)
       const fileHandler = FileHandler(this, currentConfig.encryptSecret)
-      const accountsMap = await fileHandler.getAndDecryptFlatFile()
+      const accountsMap: IStringMap = JSON.parse(
+        await fileHandler.getAndDecryptFlatFile()
+      )
       return Object.keys(accountsMap).reduce(
         (ary: IFndrAccount[], id: string) =>
-          ary.concat([{ ...accountsMap[id], id }]),
+          id ? ary.concat([{ ...accountsMap[id], id }]) : ary,
         []
       )
     },

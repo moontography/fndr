@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import Encryption from '../../libs/Encryption'
 import Config from '../../libs/Config'
+import { assert } from 'console'
 
 const mkdirPromise = fs.promises.mkdir
 const writeFilePromise = fs.promises.writeFile
@@ -17,16 +18,16 @@ export default function FileHandler(
   return {
     filepath: path.join(config.confDir, `fileSystemData`),
 
-    async getAndDecryptFlatFile() {
+    async getAndDecryptFlatFile(): Promise<string> {
+      const initVal = '{}'
       if (this.doesDirectoryExist(config.confDir)) {
         if (this.doesFileExist(this.filepath)) {
           const rawFileData = await readFilePromise(this.filepath, 'utf-8')
-          if (rawFileData.length === 0) return null
+          if (rawFileData.length === 0) return initVal
           else {
             try {
-              const accountsJson = JSON.parse(
-                (await encryption.decrypt(rawFileData)) || '{}'
-              )
+              const accountsJson =
+                (await encryption.decrypt(rawFileData)) || initVal
               return accountsJson
             } catch (err) {
               throw `We're having a problem parsing your flat file at '${this.filepath}'.
@@ -36,14 +37,17 @@ export default function FileHandler(
             }
           }
         } else {
-          await writeFilePromise(this.filepath, '')
-          return null
+          await writeFilePromise(
+            this.filepath,
+            await encryption.encrypt(initVal)
+          )
+          return initVal
         }
       }
 
       await mkdirPromise(config.confDir)
-      await writeFilePromise(this.filepath, '')
-      return ''
+      await writeFilePromise(this.filepath, await encryption.encrypt(initVal))
+      return initVal
     },
 
     async writeObjToFile(obj: any, origObj = {}) {

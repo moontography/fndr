@@ -56,7 +56,9 @@ export default function AccountMgmt(
           extra: updatedInformation.extra || originalInformation.extra || '',
         },
       }
-      const rawAccountInfo = await fileHandler.getAndDecryptFlatFile()
+      const rawAccountInfo = JSON.parse(
+        await fileHandler.getAndDecryptFlatFile()
+      )
       return await fileHandler.writeObjToFile(
         updatedAccount,
         rawAccountInfo || {}
@@ -64,7 +66,7 @@ export default function AccountMgmt(
     },
 
     async deleteAccountByUuid(uid: string) {
-      let rawAccountInfo = await fileHandler.getAndDecryptFlatFile()
+      let rawAccountInfo = JSON.parse(await fileHandler.getAndDecryptFlatFile())
       if (!(rawAccountInfo && rawAccountInfo[uid])) return false
 
       delete rawAccountInfo[uid]
@@ -73,13 +75,17 @@ export default function AccountMgmt(
     },
 
     async findAccountByUuid(uid: string) {
-      const currentAccounts = await fileHandler.getAndDecryptFlatFile()
+      const currentAccounts = JSON.parse(
+        await fileHandler.getAndDecryptFlatFile()
+      )
       if (!(currentAccounts && currentAccounts[uid])) return false
       return Object.assign(currentAccounts[uid], { id: uid })
     },
 
     async findAccountByName(name: string) {
-      const currentAccounts = await fileHandler.getAndDecryptFlatFile()
+      const currentAccounts = JSON.parse(
+        await fileHandler.getAndDecryptFlatFile()
+      )
       if (!currentAccounts) return false
 
       const matchingUuid = Object.keys(currentAccounts).filter(
@@ -120,7 +126,7 @@ export default function AccountMgmt(
       currentAccounts?: IAccounts
     ): Promise<any> {
       currentAccounts =
-        currentAccounts || (await fileHandler.getAndDecryptFlatFile())
+        currentAccounts || JSON.parse(await fileHandler.getAndDecryptFlatFile())
       if (!currentAccounts) {
         return {
           matches: [],
