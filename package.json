@@ -1,6 +1,6 @@
 {
   "name": "fndr",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Password manager that stores your information securely in the datastore of your choice through connectors.",
   "main": "./dist/fndrLibs.js",
   "repository": {
