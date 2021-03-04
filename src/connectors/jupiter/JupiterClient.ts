@@ -28,6 +28,8 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
       },
     }),
 
+    nqtToJup,
+
     decrypt: encryption.decrypt.bind(encryption),
     encrypt: encryption.encrypt.bind(encryption),
 
