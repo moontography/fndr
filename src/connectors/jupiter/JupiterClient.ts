@@ -9,12 +9,8 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
     deadline: opts.deadline || 60,
     minimumFndrAccountBalance: opts.minimumFndrAccountBalance || 50000,
     minimumUserAccountBalance: opts.minimumUserAccountBalance || 100000,
-    moneyDecimals: opts.moneyDecimals || 8,
+    jupNqtDecimals: opts.jupNqtDecimals || 8,
   }
-
-  // balances from the API come back as NQT, which is 1e-8 JUP
-  const nqtToJup = (nqt: string): string =>
-    new BigNumber(nqt).div(CONF.moneyDecimals).toString()
 
   return {
     recordKey: '__jupiter-password-manager',
@@ -28,7 +24,13 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
       },
     }),
 
-    nqtToJup,
+    // balances from the API come back as NQT, which is 1e-8 JUP
+    nqtToJup(nqt: string): string {
+      return new BigNumber(nqt).div(CONF.jupNqtDecimals).toString()
+    },
+    jupToNqt(jup: string): string {
+      return new BigNumber(jup).times(CONF.jupNqtDecimals).toString()
+    },
 
     decrypt: encryption.decrypt.bind(encryption),
     encrypt: encryption.encrypt.bind(encryption),
@@ -51,7 +53,7 @@ export default function JupiterClient(opts: IJupiterClientOpts) {
           account: address,
         },
       })
-      return nqtToJup(balanceNQT)
+      return this.nqtToJup(balanceNQT)
     },
 
     async createNewAddress(passphrase: string) {
@@ -185,7 +187,7 @@ interface IJupiterClientOpts {
   deadline?: number
   minimumFndrAccountBalance?: number
   minimumUserAccountBalance?: number
-  moneyDecimals?: number
+  jupNqtDecimals?: number
 }
 
 interface IRequestOpts {
