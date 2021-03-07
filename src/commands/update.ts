@@ -32,7 +32,7 @@ export default function UpdateCommand(connector: IFndrConnector): IFndrCommand {
     },
 
     async execute(currentConfig: string, options: any) {
-      const { name, id, username, extra } = options
+      const { name, id, username, password, extra } = options
       if (!(name || id)) {
         throw new Error(`At least a name or ID is required to get an account.`)
       }
@@ -41,28 +41,35 @@ export default function UpdateCommand(connector: IFndrConnector): IFndrCommand {
       let account = matches.find((a) => a.id === id || a.name === name)
       assert(account, `We didn't find the account you're trying to update.`)
 
-      const { password } = await inquirer.prompt([
-        {
-          name: 'password',
-          message: `The password for account (leave blank if unchanged): ${account.name}.`,
-          type: 'password',
-          default: '',
-        },
-      ])
-
-      const finalAccount = {
+      account = {
         ...account,
         name: name || account.name,
         username: username || account.username,
         extra: extra || account.extra,
         password: password || account.password,
       }
-      await connector.updateAccount(currentConfig, finalAccount)
+
+      if (options.isCli) {
+        const { password } = await inquirer.prompt([
+          {
+            name: 'password',
+            message: `The password for account: ${account.name}.`,
+            type: 'password',
+            default: '',
+          },
+        ])
+        account.password = password || undefined
+      }
+
+      await connector.updateAccount(currentConfig, account)
       return account
     },
 
     async runCli(currentConfig: string, options: any) {
-      const account = await this.execute(currentConfig, options)
+      const account = await this.execute(currentConfig, {
+        ...options,
+        isCli: true,
+      })
       return Vomit.success(`Successfully updated account: '${account.name}'!`)
     },
   }
