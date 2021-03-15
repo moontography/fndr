@@ -25,6 +25,7 @@
     "commander": "^7.1.0",
     "dayjs": "^1.10.4",
     "inquirer": "^8.0.0",
+    "jupiter-node-sdk": "^0.0.4",
     "minimist": "^1.2.5",
     "uuid": "^8.3.2"
   },

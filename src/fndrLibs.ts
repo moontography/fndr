@@ -1,8 +1,7 @@
 import Commands from './commands'
 import Connectors, { getNewJupiterAddress } from './connectors'
-import JupiterClient from './connectors/jupiter/JupiterClient'
+import JupiterClient, { Encryption } from 'jupiter-node-sdk'
 import Config from './libs/Config'
-import Encryption from './libs/Encryption'
 import FileManagement from './libs/FileManagement'
 
 export {

@@ -1,8 +1,7 @@
 import assert from 'assert'
 import inquirer from 'inquirer'
 import { v1 as uuidv1 } from 'uuid'
-import JupiterClient from './JupiterClient'
-import { generatePassphrase } from './utils'
+import JupiterClient, { generatePassphrase } from 'jupiter-node-sdk'
 
 export default JupiterConnector()
 

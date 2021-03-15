@@ -1,8 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import Encryption from '../../libs/Encryption'
+import { Encryption } from 'jupiter-node-sdk'
 import Config from '../../libs/Config'
-import { assert } from 'console'
 
 const mkdirPromise = fs.promises.mkdir
 const writeFilePromise = fs.promises.writeFile
