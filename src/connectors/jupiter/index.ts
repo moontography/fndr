@@ -97,6 +97,7 @@ export function JupiterConnector(): IFndrConnector {
         await Promise.all(
           txns.map(async (txn) => {
             try {
+              assert(client.recordKey, 'recordKey not set appropriately')
               const decryptedMessage = await client.decryptRecord(
                 txn.attachment.encryptedMessage
               )
