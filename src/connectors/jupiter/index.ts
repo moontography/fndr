@@ -175,6 +175,7 @@ export async function getNewJupiterAddress(config: IStringMap): Promise<any> {
 function getUserMainJupiterClient(config: string) {
   const currentConfig = JSON.parse(config)
   return JupiterClient({
+    recordKey: '__jupiter-password-manager',
     server: currentConfig.jupiterServer,
     address: currentConfig.fundedAddress,
     passphrase: currentConfig.fundedAddressPassphrase,
@@ -185,6 +186,7 @@ function getUserMainJupiterClient(config: string) {
 function getFndrJupiterClient(config: string) {
   const currentConfig = JSON.parse(config)
   return JupiterClient({
+    recordKey: '__jupiter-password-manager',
     server: currentConfig.jupiterServer,
     address: currentConfig.fndrAddress,
     publicKey: currentConfig.fndrPublicKey,
