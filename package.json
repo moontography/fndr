@@ -5,7 +5,7 @@
   "main": "./dist/fndrLibs.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/whatl3y/fndr"
+    "url": "https://github.com/moontography/fndr"
   },
   "bin": {
     "fndr": "dist/fndr.js"

@@ -156,7 +156,7 @@ I'd love for you to contribute to the project! Use the steps below to pull down 
 All PRs need to passing tests that test any additions or changes to existing code.
 
 ```sh
-$ git clone https://github.com/whatl3y/fndr
+$ git clone https://github.com/moontography/fndr
 $ cd fndr
 $ npm install
 $
